@@ -1,4 +1,4 @@
 # alpha
 Some GPS stuff as a test of Git and VSCODE.
 
-$$exp(sin(x))$$
+$e^{i \pi} = -1$
