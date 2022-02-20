@@ -1,8 +1,11 @@
 package geometry
 
 import (
+	"errors"
 	"fmt"
 	"math"
+	"strconv"
+	"strings"
 )
 type Point struct {
 	X, Y  float64
@@ -59,4 +62,44 @@ func (t *ScreenTransform) ToScreen(x, y float64) (a, b float64) {
 	b += t.H / 2
 	// println(fmt.Sprintf("%+v",t))
 	return a, b
+}
+
+
+// converts a DMS P1/90-style DMS string to decimal
+func decFromDMS(text string) (float64, error) {
+	var mult float64 = 1
+	ns := text[len(text)-1]
+	if strings.ToLower(string(ns)) == "s" {
+		mult = -1
+	}
+	if strings.ToLower(string(ns)) == "w" {
+		mult = -1
+	}
+	s, err := strconv.ParseFloat(text[len(text)-6:len(text)-1], 64)
+	if err != nil {
+		return 0, errors.New("Bad seconds value")
+	}
+	m, err := strconv.Atoi(text[len(text)-8 : len(text)-6])
+	if err != nil {
+		return 0, errors.New("Bad minutes value")
+	}
+	d, err := strconv.Atoi(text[0 : len(text)-8])
+	if err != nil {
+		return 0, errors.New("Bad degrees value")
+	}
+	s /= 60.0
+	s += float64(m)
+	s /= 60.0
+	s += float64(d)
+	return mult * s, nil
+}
+
+
+func dmFromDecDegree(decdeg float64) string {
+	// sign:=decdeg<0
+	a := math.Abs(decdeg)
+	d := math.Trunc(a)
+	m := a - d
+	m *= 60
+	return fmt.Sprintf("%.0f° %.4f'", d, m)
 }
