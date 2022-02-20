@@ -5,7 +5,7 @@ func StartGPS(c GPSConnection){
 }
 
 func StopGPS(){
-	
+	println("Stopping GPS...")
 }
 
 type GPSConnection struct{
