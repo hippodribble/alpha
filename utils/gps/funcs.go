@@ -5,6 +5,6 @@ func StartGPS(c GPSConnection){
 }
 
 type GPSConnection struct{
-	port string
-	baud int
+	Port string
+	Baud int
 }
