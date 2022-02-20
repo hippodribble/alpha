@@ -1,14 +1,19 @@
 package gps
 
-func StartGPS(c GPSConnection){
-	println(c.Port,c.Baud)
+type GPSDevice struct{
+	Port string
+	Baud int
+	TCPOut string
 }
 
-func StopGPS(){
+func(g *GPSDevice) StartGPS(){
+	println(g.Port,g.Baud, g.TCPOut)
+}
+
+func(g *GPSDevice) StopGPS(){
 	println("Stopping GPS...")
 }
 
-type GPSConnection struct{
-	Port string
-	Baud int
+func(g *GPSDevice) HandleGPS(){
+	println("GPS Running...")
 }
