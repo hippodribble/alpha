@@ -2,10 +2,8 @@ package gps
 
 import (
 	"bufio"
-	"fmt"
 	"log"
 	"net"
-	"os"
 
 	"github.com/tarm/serial"
 )
@@ -34,6 +32,8 @@ func (g *GPSDevice) StartGPS() bool {
 		ReadTimeout: 1,
 		Size:        8,
 	}
+	g.active=true
+	go g.Addconnections()
 	gpshandle, err := serial.OpenPort(config)
 	if err != nil {
 		println("\nFailed to open GPS unit! Check port and speed details")
@@ -41,11 +41,11 @@ func (g *GPSDevice) StartGPS() bool {
 		return g.active
 	}
 	defer gpshandle.Close()
-
 	scanner := bufio.NewScanner(gpshandle)
 	for scanner.Scan() && g.active {
 		g.HandleString(scanner.Text())
 	}
+	println("BACK")
 	return true
 }
 
@@ -64,25 +64,29 @@ func (g *GPSDevice) HandleString(text string) {
 
 }
 
-func (g *GPSDevice) Addconnections() {
+func(g *GPSDevice) Addconnections() {
 
 	tcpAddr, err := net.ResolveTCPAddr("tcp4", g.TCPOut)
 	if err != nil {
 		log.Fatal(err)
 	}
-	println("Opening server at", g.TCPOut)
+	println("Opening server at", g.TCPOut,tcpAddr.Port)
 	listener, err := net.ListenTCP("tcp", tcpAddr)
+	println("Listening")
 	if err != nil {
+		println("Error!")
 		log.Fatal(err)
 	}
 	for {
 		conn, err := listener.Accept()
 		print("Customer!")
-		println(len(g.conns), "connections")
+		println(conn.RemoteAddr().String())
+		
 		if err != nil {
 			println("Rejected conn")
 			continue
 		}
 		g.conns = append(g.conns, conn)
+		println(len(g.conns), "connections")
 	}
 }
