@@ -34,7 +34,7 @@ func (g *GPSDevice) StartGPS() bool {
 		Baud:        g.Baud,
 		ReadTimeout: 1,
 		Size:        8,
-	}
+	} 
 	gpshandle, err := serial.OpenPort(config)
 	if err != nil {
 		println("\nFailed to open GPS unit! Check port and speed details")
