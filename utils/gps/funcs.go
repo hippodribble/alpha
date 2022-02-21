@@ -4,9 +4,12 @@ import (
 	"bufio"
 	"log"
 	"net"
+	"strings"
+	"time"
 
 	"github.com/tarm/serial"
 )
+
 // Represents a serial GPS device
 type GPSDevice struct {
 	Port    string
@@ -14,6 +17,39 @@ type GPSDevice struct {
 	TCPOut  string
 	active  bool
 	conns   []net.Conn
+}
+
+type GPSFloatField struct{
+	Label string
+	Timetag time.Time
+	value float64
+	filterlength int `default:"1"`
+	history []float64
+}
+
+func(f *GPSFloatField) SetFilterLength(n int){
+	f.history = make([]float64,n)
+}
+
+func(f *GPSFloatField) GetFilterLength() int{
+	return f.filterlength
+}
+
+func(f *GPSFloatField) SetValue(v float64, t time.Time) {
+	if f.filterlength==1{
+		f.value = v
+		return
+	}
+	f.history = append(f.history[1:],v)
+	sum:=0.0
+	for i:=0;i<len(f.history);i++{
+		sum += f.history[i]
+	}
+	f.value = sum/float64(len(f.history))
+	f.Timetag = t
+}
+func(f *GPSFloatField) GetValue() float64{
+	return f.value
 }
 
 
@@ -60,6 +96,22 @@ func (g *GPSDevice) handleString(text string) {
 		g.conns[delconn] = g.conns[len(g.conns)-1]
 		g.conns = g.conns[:len(g.conns)-1]
 	}
+	g.processNMEA(text)
+}
+
+func (g *GPSDevice) processNMEA(text string){
+	if len(text)<6{return}
+	// println("Process",text[3:6])
+	arr:=strings.Split(text,",")
+	if len(arr)<3{
+		println("Short")
+		return
+	}
+	switch text[3:6]{
+	case "RMC":
+
+	}
+
 
 }
 
