@@ -21,10 +21,6 @@ func (g *GPSDevice) StopGPS() {
 	g.active = false
 }
 
-func (g *GPSDevice) HandleGPS() {
-	println("GPS Running...")
-}
-
 func (g *GPSDevice) StartGPS() bool {
 	config := &serial.Config{
 		Name:        g.Port,
@@ -33,7 +29,7 @@ func (g *GPSDevice) StartGPS() bool {
 		Size:        8,
 	}
 	g.active=true
-	go g.Addconnections()
+	go g.addconnections()
 	gpshandle, err := serial.OpenPort(config)
 	if err != nil {
 		println("\nFailed to open GPS unit! Check port and speed details")
@@ -43,13 +39,13 @@ func (g *GPSDevice) StartGPS() bool {
 	defer gpshandle.Close()
 	scanner := bufio.NewScanner(gpshandle)
 	for scanner.Scan() && g.active {
-		g.HandleString(scanner.Text())
+		g.handleString(scanner.Text())
 	}
 	println("BACK")
 	return true
 }
 
-func (g *GPSDevice) HandleString(text string) {
+func (g *GPSDevice) handleString(text string) {
 	var delconn int = -1
 	for i, conn := range g.conns {
 		_, err := conn.Write([]byte(text + "\n"))
@@ -64,7 +60,7 @@ func (g *GPSDevice) HandleString(text string) {
 
 }
 
-func(g *GPSDevice) Addconnections() {
+func(g *GPSDevice) addconnections() {
 
 	tcpAddr, err := net.ResolveTCPAddr("tcp4", g.TCPOut)
 	if err != nil {
