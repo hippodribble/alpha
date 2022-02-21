@@ -7,7 +7,7 @@ import (
 
 	"github.com/tarm/serial"
 )
-
+// Represents a serial GPS device
 type GPSDevice struct {
 	Port    string
 	Baud    int
@@ -16,11 +16,7 @@ type GPSDevice struct {
 	conns   []net.Conn
 }
 
-func (g *GPSDevice) StopGPS() {
-	println("Stopping GPS...")
-	g.active = false
-}
-
+// Start the GPS server (serial to TCP)
 func (g *GPSDevice) StartGPS() bool {
 	config := &serial.Config{
 		Name:        g.Port,
@@ -44,7 +40,13 @@ func (g *GPSDevice) StartGPS() bool {
 	println("BACK")
 	return true
 }
+// Stop the GPS server
+func (g *GPSDevice) StopGPS() {
+	println("Stopping GPS...")
+	g.active = false
+}
 
+// serves NMEA data to clients
 func (g *GPSDevice) handleString(text string) {
 	var delconn int = -1
 	for i, conn := range g.conns {
@@ -60,6 +62,7 @@ func (g *GPSDevice) handleString(text string) {
 
 }
 
+//manages connections to network clients
 func(g *GPSDevice) addconnections() {
 
 	tcpAddr, err := net.ResolveTCPAddr("tcp4", g.TCPOut)
