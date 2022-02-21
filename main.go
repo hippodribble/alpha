@@ -17,6 +17,5 @@ func main(){
 	server.Port="COM8"
 	server.TCPOut=":5544"
 
-	started:=server.StartGPS()
-	println(started)
+	server.StartGPS()
 }
