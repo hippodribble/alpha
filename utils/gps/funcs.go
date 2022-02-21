@@ -18,7 +18,14 @@ type GPSDevice struct {
 	TCPOut string
 	active bool
 	conns  []net.Conn
+	fields TalkingMap
+}
+
+type TalkingMap struct{
 	fields map[string]*GPSFloatField
+}
+func (m *TalkingMap) Set(key string,val *GPSFloatField){
+
 }
 
 type GPSFloatField struct {
@@ -102,8 +109,6 @@ func (g *GPSDevice) handleString(text string) {
 	g.processNMEA(text)
 }
 
-
-
 //manages connections to network clients
 func (g *GPSDevice) addconnections() {
 
@@ -160,6 +165,37 @@ func (g *GPSDevice) processNMEA(text string) {
 		field.value = floatval
 		println(field.value, field.stringvalue)
 		g.fields["UTC"] = field
-	}
 
+		if arr[2] == "" {
+			return
+		}
+		field = new(GPSFloatField)
+		field.Label = "UTC"
+		field.SetFilterLength(5)
+		floatval, err = strconv.ParseFloat(arr[2], 64)
+		if err != nil {
+			return
+		}
+		field.timetag = time.Now()
+		field.stringvalue = arr[1]
+		field.value = floatval
+		println(field.value, field.stringvalue)
+		g.fields["Latitude"] = field
+		
+		if arr[4] == "" {
+			return
+		}
+		field = new(GPSFloatField)
+		field.Label = "UTC"
+		field.SetFilterLength(5)
+		floatval, err = strconv.ParseFloat(arr[4], 64)
+		if err != nil {
+			return
+		}
+		field.timetag = time.Now()
+		field.stringvalue = arr[4]
+		field.value = floatval
+		println(field.value, field.stringvalue)
+		g.fields["Longitude"] = field
+	}
 }
