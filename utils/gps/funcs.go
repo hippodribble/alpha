@@ -7,7 +7,6 @@ import (
 	"strconv"
 	"strings"
 	"time"
-
 	"github.com/tarm/serial"
 )
 
@@ -58,6 +57,7 @@ func (f *GPSFloatField) SetValue(v float64, t time.Time) {
 	f.value = sum / float64(len(f.history))
 	f.timetag = t
 }
+
 func (f *GPSFloatField) GetValue() float64 {
 	return f.value
 }
@@ -84,7 +84,6 @@ func (g *GPSDevice) StartGPS()  {
 	for scanner.Scan() && g.active {
 		g.handleString(scanner.Text())
 	}
-	
 }
 
 // Stop the GPS server
