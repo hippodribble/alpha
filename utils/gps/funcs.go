@@ -18,13 +18,13 @@ type GPSDevice struct {
 	TCPOut string
 	active bool
 	conns  []net.Conn
-	fields TalkingMap
+	hub Hub
 }
 
-type TalkingMap struct{
+type Hub struct{
 	fields map[string]*GPSFloatField
 }
-func (m *TalkingMap) Set(key string,val *GPSFloatField){
+func (m *Hub) Set(key string,val *GPSFloatField){
 
 }
 
@@ -70,7 +70,7 @@ func (g *GPSDevice) StartGPS()  {
 		ReadTimeout: 1,
 		Size:        8,
 	}
-	g.fields = make(map[string]*GPSFloatField,10)
+	g.hub = Hub{ make(map[string]*GPSFloatField,10)}
 	println("Made Field map")
 	g.active = true
 	go g.addconnections()
@@ -164,7 +164,7 @@ func (g *GPSDevice) processNMEA(text string) {
 		field.stringvalue = arr[1]
 		field.value = floatval
 		println(field.value, field.stringvalue)
-		g.fields["UTC"] = field
+		g.hub.fields["UTC"] = field
 
 		if arr[2] == "" {
 			return
@@ -180,7 +180,7 @@ func (g *GPSDevice) processNMEA(text string) {
 		field.stringvalue = arr[1]
 		field.value = floatval
 		println(field.value, field.stringvalue)
-		g.fields["Latitude"] = field
+		g.hub.fields["Latitude"] = field
 		
 		if arr[4] == "" {
 			return
@@ -196,6 +196,6 @@ func (g *GPSDevice) processNMEA(text string) {
 		field.stringvalue = arr[4]
 		field.value = floatval
 		println(field.value, field.stringvalue)
-		g.fields["Longitude"] = field
+		g.hub.fields["Longitude"] = field
 	}
 }
